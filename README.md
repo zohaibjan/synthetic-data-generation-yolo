@@ -6,6 +6,10 @@ Example: upload aerial road scenes and a top-down car photo, ask for realistic d
 
 [Product preview](https://zohaibjan.github.io/synthetic-data-demo/?preview=1) · [Zohaib's portfolio](https://zohaibjan.github.io/) · [Vision Training Hub](https://github.com/zohaibjan/vision-training-hub)
 
+![React studio in read-only preview mode](docs/studio-preview.jpg)
+
+*Actual interface screenshot. The aerial scene is an illustration, not an inference result.*
+
 ## What it does
 
 - **Prompt only:** Stable Diffusion text-to-image at 512 × 512.
