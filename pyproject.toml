@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+[project]
+name = "synthetic-data-generation-yolo"
+version = "0.1.0"
+description = "Stable Diffusion generation, human label review, and YOLO dataset export"
+requires-python = ">=3.11"
+license = {text = "AGPL-3.0-or-later"}
+dependencies = ["fastapi>=0.115,<1", "uvicorn>=0.30,<1", "pydantic>=2.9,<3", "Pillow>=10,<13", "PyYAML>=6,<7", "python-multipart>=0.0.18,<1"]
+[project.optional-dependencies]
+generate = ["diffusers>=0.30,<1", "transformers>=4.44,<5", "accelerate>=1,<2", "torch>=2.4,<3", "safetensors>=0.4,<1"]
+cutout = ["rembg[cpu]>=2.0,<3"]
+label = ["ultralytics>=8.3,<9"]
+dev = ["pytest>=8,<10", "httpx>=0.27,<1"]
+[tool.setuptools.packages.find]
+include = ["synth*"]
+[tool.setuptools.package-data]
+synth = ["static/*", "static/assets/*"]
+[tool.pytest.ini_options]
+testpaths = ["tests"]

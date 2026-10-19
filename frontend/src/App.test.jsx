@@ -1,0 +1,13 @@
+import React from 'react';
+import '@testing-library/jest-dom/vitest';
+import {render,screen,cleanup,fireEvent,waitFor} from '@testing-library/react';
+import {afterEach,test,expect,vi} from 'vitest';
+import App,{parseBoxes} from './App.jsx';
+afterEach(()=>{cleanup();vi.restoreAllMocks();history.replaceState({},'','/')});
+test('parses label coordinates',()=>expect(parseBoxes('0 0.5 0.5 0.1 0.2')[0].w).toBe(.1));
+test('rejects malformed labels',()=>expect(()=>parseBoxes('car 0.5')).toThrow());
+test('empty labels are supported for explicit negative review',()=>expect(parseBoxes('')).toEqual([]));
+test('preview disables uploads and generation without calling backend',()=>{history.replaceState({},'','/?preview=1');const fetch=vi.spyOn(globalThis,'fetch');render(<App/>);expect(screen.getByRole('button',{name:/Generate dataset/})).toBeDisabled();expect(screen.getByLabelText(/Scenery images/)).toBeDisabled();expect(fetch).not.toHaveBeenCalled()});
+test('disconnected app requires connection',()=>{render(<App/>);expect(screen.getByLabelText('Server API token')).toBeTruthy();expect(screen.getByRole('button',{name:/Generate dataset/})).toBeDisabled()});
+test('authentication errors are visible',async()=>{vi.spyOn(globalThis,'fetch').mockResolvedValue({ok:false,json:async()=>({detail:'Invalid API token'})});render(<App/>);fireEvent.change(screen.getByLabelText('Server API token'),{target:{value:'bad'}});fireEvent.click(screen.getByRole('button',{name:'Connect'}));expect(await screen.findByRole('alert')).toBeTruthy()});
+test('connect and submit typed generation request',async()=>{const fetch=vi.spyOn(globalThis,'fetch').mockResolvedValue({ok:true,json:async()=>[]});render(<App/>);fireEvent.change(screen.getByLabelText('Server API token'),{target:{value:'test'}});fireEvent.click(screen.getByRole('button',{name:'Connect'}));await screen.findByRole('button',{name:'Disconnect'});fireEvent.click(screen.getByRole('button',{name:/Generate dataset/}));await waitFor(()=>expect(fetch.mock.calls.some(([,o])=>o?.method==='POST')).toBe(true));const call=fetch.mock.calls.find(([,o])=>o?.method==='POST');expect(JSON.parse(call[1].body)).toMatchObject({count:12,scene_ids:[],object_ids:[],strength:.3})});
